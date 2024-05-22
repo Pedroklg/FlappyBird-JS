@@ -85,3 +85,17 @@ body {
   font-size: 70px;
   z-index: 100;
 }
+
+.botao-reiniciar {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 20px;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 15%;
+  font-weight: 800;
+  font-size: 20px;
+}
