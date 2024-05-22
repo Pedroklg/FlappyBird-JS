@@ -1,4 +1,4 @@
-function novoElemento (tagName, className) {
+function novoElemento(tagName, className) {
   const elem = document.createElement(tagName);
   elem.className = className;
   return elem;
@@ -8,7 +8,7 @@ function Barreira(reversa = false) {
   this.elemento = novoElemento('div', 'barreira');
 
   const borda = novoElemento('div', 'borda');
-  const corpo = novoElemento('div',  'corpo');
+  const corpo = novoElemento('div', 'corpo');
   this.elemento.appendChild(reversa ? corpo : borda);
   this.elemento.appendChild(reversa ? borda : corpo);
 
@@ -38,9 +38,10 @@ function ParDeBarreiras(altura, abertura, x) {
   this.sortearArbertura();
   this.setX(x);
 }
+
 function Barreiras(altura, largura, abertura, espaco, notificarPonto) {
   this.pares = [
-    new ParDeBarreiras(altura,abertura,largura),
+    new ParDeBarreiras(altura, abertura, largura),
     new ParDeBarreiras(altura, abertura, largura + espaco),
     new ParDeBarreiras(altura, abertura, largura + espaco * 2),
     new ParDeBarreiras(altura, abertura, largura + espaco * 3)
@@ -51,7 +52,7 @@ function Barreiras(altura, largura, abertura, espaco, notificarPonto) {
     this.pares.forEach(par => {
       par.setX(par.getX() - deslocamento);
       
-      //quando o elemento sair da área do jogo
+      // Quando o elemento sair da área do jogo
       if (par.getX() < -par.getLargura()) {
         par.setX(par.getX() + espaco * this.pares.length);
         par.sortearArbertura();
@@ -60,7 +61,7 @@ function Barreiras(altura, largura, abertura, espaco, notificarPonto) {
       const meio = largura / 2;
       const cruzouMeio = par.getX() + deslocamento >= meio
         && par.getX() < meio;
-      if(cruzouMeio) notificarPonto()
+      if (cruzouMeio) notificarPonto();
 
     })
   }
@@ -82,19 +83,17 @@ function Passaro(alturaJogo) {
     const novoY = this.getY() + (voando ? 8 : -5);
     const alturaMaxima = alturaJogo - this.elemento.clientHeight;
 
-    if(novoY <= 0) {
+    if (novoY <= 0) {
       this.setY(0);
-    }else if(novoY >= alturaMaxima){
+    } else if (novoY >= alturaMaxima) {
       this.setY(alturaMaxima);
-    }else {
+    } else {
       this.setY(novoY);
     }
   }
 
   this.setY(alturaJogo / 2);
 }
-
-
 
 function Progresso() {
   this.elemento = novoElemento('span', 'progresso');
@@ -104,7 +103,7 @@ function Progresso() {
   this.atualizarPontos(0);
 }
 
-function estaoSobrepostos(elementoA, elementoB){
+function estaoSobrepostos(elementoA, elementoB) {
   const a = elementoA.getBoundingClientRect();
   const b = elementoB.getBoundingClientRect();
 
@@ -116,7 +115,7 @@ function estaoSobrepostos(elementoA, elementoB){
   return horizontal && vertical;
 }
 
-function colidiu(passaro, barreiras){
+function colidiu(passaro, barreiras) {
   let colidiu = false;
   barreiras.pares.forEach(parDeBarreiras => {
     if (!colidiu) {
@@ -129,6 +128,12 @@ function colidiu(passaro, barreiras){
   return colidiu;
 }
 
+function criarBotaoReiniciar() {
+  const botao = novoElemento('button', 'botao-reiniciar');
+  botao.innerHTML = 'Try Again';
+  return botao;
+}
+
 function FlappyBird() {
   let pontos = 0;
 
@@ -137,24 +142,39 @@ function FlappyBird() {
   const largura = areaDoJogo.clientWidth;
 
   const progresso = new Progresso();
-  const barreiras = new Barreiras(altura,largura, 200, 400,
+  const barreiras = new Barreiras(altura, largura, 200, 400,
     () => progresso.atualizarPontos(++pontos));
   const passaro = new Passaro(altura);
+  const botaoReiniciar = criarBotaoReiniciar();
 
   areaDoJogo.appendChild(progresso.elemento);
   areaDoJogo.appendChild(passaro.elemento);
   barreiras.pares.forEach(par => areaDoJogo.appendChild(par.elemento));
+  areaDoJogo.appendChild(botaoReiniciar);
+
+  const reiniciarJogo = () => {
+    pontos = 0;
+    progresso.atualizarPontos(pontos);
+    barreiras.pares.forEach((par, index) => {
+      par.setX(largura + index * 400);
+      par.sortearArbertura();
+    });
+    passaro.setY(altura / 2);
+    botaoReiniciar.style.display = 'none';
+    this.start();
+  }
 
   this.start = () => {
-    //loop do jogo
     const temporizador = setInterval(() => {
       barreiras.animar();
       passaro.animar();
 
-      if(colidiu(passaro,barreiras)) {
+      if (colidiu(passaro, barreiras)) {
         clearInterval(temporizador);
+        botaoReiniciar.style.display = 'block';
+        botaoReiniciar.onclick = reiniciarJogo; 
       }
-    },20)
+    }, 20);
   }
 }
 
