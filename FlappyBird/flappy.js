@@ -52,7 +52,6 @@ function Barreiras(altura, largura, abertura, espaco, notificarPonto) {
     this.pares.forEach(par => {
       par.setX(par.getX() - deslocamento);
       
-      // Quando o elemento sair da área do jogo
       if (par.getX() < -par.getLargura()) {
         par.setX(par.getX() + espaco * this.pares.length);
         par.sortearArbertura();
